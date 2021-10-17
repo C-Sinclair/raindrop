@@ -11,25 +11,29 @@ import (
 const BASE_URL = "https://api.raindrop.io/rest/v1"
 
 type collectionsRes struct {
-  result bool
-  items []Collection
+  Result bool
+  Items []Collection
 }
 
 type Collection struct {
-  _id int // The id of the Collection
-  access Access
-  collaborators Collaborators // When this object is present, means that collections is shared. Content of this object is private and not very useful.
-  color string // primary color of the collection as HEX  
-  count int // count of raindrops in collection
-  cover []string // Collection cover URL. This array always have one item due to legacy reasons
-  created string // when the collection is created
-  expanded bool // Whether the collection’s sub-collections are expanded
-  lastUpdate string // When the collection is updated
-  parent Parent
-  public bool // Collection and raindrops that it contains will be accessible without authentication by public link
-  sort int // The order of collection (descending). Defines the position of the collection among all the collections with the same parent.$id
-  title string // Name of the collection
-  user User 
+  Id int `json:"_id"` // The id of the Collection
+  Access Access
+  Author *bool // user is the author 
+  Collaborators *Collaborators // When this object is present, means that collections is shared. Content of this object is private and not very useful.
+  Color *string // primary color of the collection as HEX  
+  Count int // count of raindrops in collection
+  Cover []string // Collection cover URL. This array always have one item due to legacy reasons
+  Created string // when the collection is created
+  // creatorRef 
+  Expanded bool // Whether the collection’s sub-collections are expanded
+  LastAction string 
+  LastUpdate string // When the collection is updated
+  Parent *Parent
+  Public bool // Collection and raindrops that it contains will be accessible without authentication by public link
+  Slug string
+  Sort int // The order of collection (descending). Defines the position of the collection among all the collections with the same parent.$id
+  Title string // Name of the collection
+  User User 
   /** 
   view style of Collection
   - list (default)
@@ -37,7 +41,7 @@ type Collection struct {
   - grid
   - masonry (Pinterest like grid)
   */
-  view string 
+  View string 
 }
 
 type Access struct {
@@ -47,24 +51,25 @@ type Access struct {
   3 - collaborator with write only access
   4 - owner
   */
-  level int
-  draggable bool // Does it possible to change parent of this collection?
+  Level int
+  Draggable bool // Does it possible to change parent of this collection?
+  Root *bool 
 }
 
 type Collaborators struct {}
 
 type Parent struct {
   // the id of the parent collection. Not specified for root collections 
-  id int `json:"$id"`
+  Id int `json:"$id"`
 }
 
 type User struct {
   // owner id 
-  id int `json:"$id"`
+  Id int `json:"$id"`
 }
 
-func GetCollections() {
-  print("Get my collections")
+func GetCollections() ([]Collection, error) {
+  fmt.Println("Getting collections...")
 
   url := fmt.Sprintf("%s/collections", BASE_URL)
   token := fmt.Sprintf("Bearer %s", os.Getenv("ACCESS_TOKEN"))
@@ -82,10 +87,8 @@ func GetCollections() {
   }
   defer res.Body.Close()
 
-  // TODO: get collections decoding into the struct
   collections := new(collectionsRes)
-  json.NewDecoder(res.Body).Decode(collections)
+  err = json.NewDecoder(res.Body).Decode(collections)
 
-  str, _ := json.Marshal(collections)
-  log.Printf(string(str))
+  return collections.Items, err
 }

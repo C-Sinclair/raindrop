@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"raindrop/pkg"
 
@@ -8,12 +9,16 @@ import (
 )
 
 func main() {
-  print("Raindrop 💧")
+  fmt.Println("Raindrop 💧")
   // load .env
   err := godotenv.Load()
   if err != nil {
     log.Fatalln(err)
   }
-  collection.GetCollections()
+  collections, err := collection.GetCollections()
+  if err != nil {
+    log.Fatalln(err)
+  }
+  fmt.Println("Found ", len(collections), " Collections!")
 }
 
