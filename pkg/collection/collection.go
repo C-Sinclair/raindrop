@@ -4,11 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"net/http"
-	"os"
-)
 
-const BASE_URL = "https://api.raindrop.io/rest/v1"
+	"raindrop/pkg/request"
+)
 
 type collectionsRes struct {
   Result bool
@@ -68,24 +66,18 @@ type User struct {
   Id int `json:"$id"`
 }
 
+func decode() {
+
+}
+
 func GetCollections() ([]Collection, error) {
   fmt.Println("Getting collections...")
 
-  url := fmt.Sprintf("%s/collections", BASE_URL)
-  token := fmt.Sprintf("Bearer %s", os.Getenv("ACCESS_TOKEN"))
-  client := &http.Client{}
-
-  req, err := http.NewRequest("GET", url, nil)
+  res, err := request.GetRequest("/collections")
   if err != nil {
-    log.Fatal(err)
+    log.Fatalln(err)
   }
-  req.Header.Set("Authorization", token)
-
-  res, err := client.Do(req)
-  if err != nil {
-    log.Fatal(err)
-  }
-  defer res.Body.Close()
+	defer res.Body.Close()
 
   collections := new(collectionsRes)
   err = json.NewDecoder(res.Body).Decode(collections)
