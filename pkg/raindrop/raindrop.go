@@ -14,8 +14,8 @@ type raindropsRes struct {
 }
 
 type raindropRes struct {
-  Result bool 
-  Item Raindrop
+	Result bool
+	Item   Raindrop
 }
 
 type Raindrop struct {
@@ -52,26 +52,26 @@ func GetRaindrops(search string) ([]Raindrop, error) {
 		query += fmt.Sprintf("&search=%s", search)
 	}
 	url := fmt.Sprintf("/raindrops/0%s", query)
-  page := 1
-  var results []Raindrop
-  for {
-    res, err := getPaginatedRaindrops(url, page)
-    if err != nil {
-      log.Fatal(err)
-    }
-    results = append(results, res.Items...)
-    if res.Result == true && len(res.Items) > 0 {
-      page = page + 1 
-      continue 
-    }
-    break
-  }
-  return results, nil
+	page := 1
+	var results []Raindrop
+	for {
+		res, err := getPaginatedRaindrops(url, page)
+		if err != nil {
+			log.Fatal(err)
+		}
+		results = append(results, res.Items...)
+		if res.Result == true && len(res.Items) > 0 {
+			page = page + 1
+			continue
+		}
+		break
+	}
+	return results, nil
 }
 
 func getPaginatedRaindrops(url string, page int) (*raindropsRes, error) {
-  get_url := fmt.Sprintf("%s&page=%d", url, page)
-  // fmt.Println("Getting from ", get_url)
+	get_url := fmt.Sprintf("%s&page=%d", url, page)
+	// fmt.Println("Getting from ", get_url)
 	res, err := request.GetRequest(get_url)
 	if err != nil {
 		log.Fatal(err)
@@ -86,14 +86,14 @@ func getPaginatedRaindrops(url string, page int) (*raindropsRes, error) {
 
 func GetRaindrop(id string) (Raindrop, error) {
 	url := fmt.Sprintf("/raindrop/%s", id)
-  res, err := request.GetRequest(url)
-  if err != nil {
-    log.Fatal(err)
-  }
-  defer res.Body.Close()
+	res, err := request.GetRequest(url)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer res.Body.Close()
 
-  raindrop := new (raindropRes)
-  err = json.NewDecoder(res.Body).Decode(raindrop)
-  
-  return raindrop.Item, err
-}  
+	raindrop := new(raindropRes)
+	err = json.NewDecoder(res.Body).Decode(raindrop)
+
+	return raindrop.Item, err
+}
