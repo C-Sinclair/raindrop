@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"runtime"
 	"strings"
 	"time"
 
@@ -39,8 +40,7 @@ func main() {
   })
   id := strings.Split(selected, " ")[0]
   raindrop, err := raindrop.GetRaindrop(id)
-  url := raindrop.Link
-  err = exec.Command("xdg-open", url).Start()
+  err = openInBrowser(raindrop.Link)
   if err != nil {
     log.Fatal(err)
   }
@@ -60,4 +60,17 @@ func doSearch(input func(in io.WriteCloser)) string {
   }()
   result, _ := cmd.Output()
   return string(result)
+}
+
+func openInBrowser(url string) error {
+	switch runtime.GOOS {
+	case "linux":
+		return exec.Command("xdg-open", url).Start()
+	case "windows":
+		return exec.Command("rundll32", "url.dll,FileProtocolHandler", url).Start()
+	case "darwin":
+		return exec.Command("open", url).Start()
+	default:
+		return fmt.Errorf("unsupported platform")
+	}
 }
