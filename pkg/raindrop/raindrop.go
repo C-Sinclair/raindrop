@@ -13,6 +13,11 @@ type raindropsRes struct {
 	Items  []Raindrop
 }
 
+type raindropRes struct {
+  Result bool 
+  Item Raindrop
+}
+
 type Raindrop struct {
 	Id         int `json:"_id"` // The id of the Collection
 	Collection RaindropCollection
@@ -40,7 +45,7 @@ type RaindropMedia struct {
 }
 
 func GetRaindrops(search string) ([]Raindrop, error) {
-	// fmt.Println("Getting raindrops...")
+	fmt.Println("Getting raindrops...")
 
 	query := "?perpage=50"
 	if len(search) > 0 {
@@ -69,7 +74,7 @@ func getPaginatedRaindrops(url string, page int) (*raindropsRes, error) {
   // fmt.Println("Getting from ", get_url)
 	res, err := request.GetRequest(get_url)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatal(err)
 	}
 	defer res.Body.Close()
 
@@ -78,3 +83,17 @@ func getPaginatedRaindrops(url string, page int) (*raindropsRes, error) {
 
 	return drops, err
 }
+
+func GetRaindrop(id string) (Raindrop, error) {
+	url := fmt.Sprintf("/raindrop/%s", id)
+  res, err := request.GetRequest(url)
+  if err != nil {
+    log.Fatal(err)
+  }
+  defer res.Body.Close()
+
+  raindrop := new (raindropRes)
+  err = json.NewDecoder(res.Body).Decode(raindrop)
+  
+  return raindrop.Item, err
+}  
