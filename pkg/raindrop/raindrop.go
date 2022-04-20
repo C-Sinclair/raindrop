@@ -3,9 +3,9 @@ package raindrop
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/C-Sinclair/raindrop/pkg/collection"
+	"github.com/C-Sinclair/raindrop/pkg/request"
 	"log"
-	"raindrop/pkg/collection"
-	"raindrop/pkg/request"
 )
 
 type raindropsRes struct {
@@ -96,4 +96,26 @@ func GetRaindrop(id string) (Raindrop, error) {
 	err = json.NewDecoder(res.Body).Decode(raindrop)
 
 	return raindrop.Item, err
+}
+
+func GetRaindropsForCollection(collection string) ([]Raindrop, error) {
+	fmt.Printf("Getting raindrops for %s...", collection)
+
+	query := fmt.Sprintf("?perpage=50&collection=%s", collection)
+	url := fmt.Sprintf("/raindrops/0%s", query)
+	page := 1
+	var results []Raindrop
+	for {
+		res, err := getPaginatedRaindrops(url, page)
+		if err != nil {
+			log.Fatal(err)
+		}
+		results = append(results, res.Items...)
+		if res.Result == true && len(res.Items) > 0 {
+			page = page + 1
+			continue
+		}
+		break
+	}
+	return results, nil
 }

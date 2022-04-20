@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"raindrop/pkg/raindrop"
+	"github.com/C-Sinclair/raindrop/pkg/raindrop"
 
 	"github.com/joho/godotenv"
 )

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	"raindrop/pkg/request"
+	"github.com/C-Sinclair/raindrop/pkg/request"
 )
 
 type collectionsRes struct {
