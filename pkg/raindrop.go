@@ -3,8 +3,6 @@ package raindrop
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/C-Sinclair/raindrop/pkg/collection"
-	"github.com/C-Sinclair/raindrop/pkg/request"
 	"log"
 )
 
@@ -32,7 +30,7 @@ type Raindrop struct {
 	Tags       []string // tags list
 	Title      string   // Name of the collection
 	Type       string   // link article image video document or audio
-	User       collection.User
+	User       User
 }
 
 type RaindropCollection struct {
@@ -72,7 +70,7 @@ func GetRaindrops(search string) ([]Raindrop, error) {
 func getPaginatedRaindrops(url string, page int) (*raindropsRes, error) {
 	get_url := fmt.Sprintf("%s&page=%d", url, page)
 	// fmt.Println("Getting from ", get_url)
-	res, err := request.GetRequest(get_url)
+	res, err := GetRequest(get_url)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -86,7 +84,7 @@ func getPaginatedRaindrops(url string, page int) (*raindropsRes, error) {
 
 func GetRaindrop(id string) (Raindrop, error) {
 	url := fmt.Sprintf("/raindrop/%s", id)
-	res, err := request.GetRequest(url)
+	res, err := GetRequest(url)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -101,7 +99,21 @@ func GetRaindrop(id string) (Raindrop, error) {
 func GetRaindropsForCollection(collection string) ([]Raindrop, error) {
 	fmt.Printf("Getting raindrops for %s...", collection)
 
-	query := fmt.Sprintf("?perpage=50&collection=%s", collection)
+	collections, err := GetCollections()
+	if err != nil {
+		log.Fatal(err)
+	}
+	var collection_id int
+	for _, c := range collections {
+		if collection == c.Title {
+			collection_id = c.Id
+		}
+	}
+	if collection_id == 0 {
+		log.Fatal("This collection does not exist")
+	}
+
+	query := fmt.Sprintf("?perpage=50&collection=%s", collection_id)
 	url := fmt.Sprintf("/raindrops/0%s", query)
 	page := 1
 	var results []Raindrop

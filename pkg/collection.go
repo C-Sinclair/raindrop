@@ -1,11 +1,9 @@
-package collection
+package raindrop
 
 import (
 	"encoding/json"
 	"fmt"
 	"log"
-
-	"github.com/C-Sinclair/raindrop/pkg/request"
 )
 
 type collectionsRes struct {
@@ -66,14 +64,10 @@ type User struct {
 	Id int `json:"$id"`
 }
 
-func decode() {
-
-}
-
 func GetCollections() ([]Collection, error) {
 	fmt.Println("Getting collections...")
 
-	res, err := request.GetRequest("/collections")
+	res, err := GetRequest("/collections")
 	if err != nil {
 		log.Fatalln(err)
 	}
