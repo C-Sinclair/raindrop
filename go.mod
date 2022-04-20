@@ -1,4 +1,4 @@
-module raindrop
+module github.com/C-Sinclair/raindrop
 
 go 1.15
 
